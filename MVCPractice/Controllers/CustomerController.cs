@@ -16,10 +16,11 @@ namespace MVCPractice.Controllers
         public ActionResult Index()
         {
             string userId=Convert.ToString(Session["userId"]);
-            BankEntities1 dbContext = new BankEntities1();
+            Session["medal"] = null;
+            BankEntities2 dbContext = new BankEntities2();
             Customer customer = dbContext.Customers.Single(x => x.userId == userId);
-            List<Account> accounts = (dbContext.Accounts.Where(y=>y.customerId==customer.customerId)).ToList();
-            Session["medal"]=null;    
+            List<Account> accounts = (dbContext.Accounts.Where(x=>x.customerId==customer.customerId)).ToList();
+                
             return View(accounts);
         }
 
@@ -34,12 +35,14 @@ namespace MVCPractice.Controllers
             {
                 Session["accountNumber"] = selectedAccount;
                 int selectedAccount2 = int.Parse(selectedAccount);
-                BankEntities1 dbContext = new BankEntities1();
+                BankEntities2 dbContext = new BankEntities2();
                 Account account = dbContext.Accounts.Single(x => x.accountNo == selectedAccount2);
-                var amount=account.amount;
+                var amount = account.amount;
                 CustomerMedal cmedal = dbContext.CustomerMedals.Single(x => amount > x.min && amount < x.max);
                 Session["medal"] = cmedal.type;
                 return RedirectToAction("Menu");
+
+                
             }
 
         }
@@ -56,14 +59,12 @@ namespace MVCPractice.Controllers
         {
             return View();
         }
-
+    
         [HttpPost]
-        public ActionResult FundTransfer(long accountNo,long destinationAccountNo,int amount,string comment)
+        public ActionResult FundTransfer(long destinationAccountNo,int amount,string comment)
         {
-            
-            try
-            {
-
+            try{
+                long accountNo = long.Parse(Session["accountNumber"].ToString());
                 CustomerClass obj = new CustomerClass();
                 TransactionClass obj1 = new TransactionClass();
                 if (accountNo == destinationAccountNo)
@@ -95,19 +96,22 @@ namespace MVCPractice.Controllers
                 {
                     ViewBag.Error="Destination Account not found";
                 }
-            }
-
+                Session["medal"] = obj.checkMedal(accountNo);
+            
+        }
             catch (Exception exp)
             {
-                ViewBag.Error = "Exception "+exp;
+                ViewBag.Error = "Exception";
             }
             return View();
         }
+    
+    
 
         public ActionResult MiniStatement()
         {
             long accountNo =  long.Parse((Session["accountNumber"]).ToString());
-            BankEntities1 dbContext = new BankEntities1();
+            BankEntities2 dbContext = new BankEntities2();
 
             List<Transaction> transactions = (List<Transaction>)(dbContext.Transactions.Where(x => x.fromAccountNo == accountNo || x.toAccountNo == accountNo).OrderByDescending(x => x.transactionId).ToList());
 
@@ -133,7 +137,7 @@ namespace MVCPractice.Controllers
         public ActionResult BalanceEnquiry()
         {
             long accountNo = long.Parse((Session["accountNumber"]).ToString());
-            BankEntities1 dbContext = new BankEntities1();
+            BankEntities2 dbContext = new BankEntities2();
             Account account = (Account)(dbContext.Accounts.Single(x => x.accountNo == accountNo));
             return View(account);
         }
@@ -148,7 +152,7 @@ namespace MVCPractice.Controllers
         {
             CustomerClass obj = new CustomerClass();
             int accountNo=Int32.Parse(( Session["accountNumber"].ToString()));
-            IList<Transaction> transactions=obj.customstatement(accountNo,fromDate,toDate);
+            IList<datecheck_Result> transactions=obj.customstatement(accountNo,fromDate,toDate);
 
             
             return View("customStatementTable",transactions);

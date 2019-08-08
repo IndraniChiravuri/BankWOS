@@ -15,10 +15,10 @@ namespace BusinessLayer
     using System.Data.Entity.Core.Objects;
     using System.Linq;
     
-    public partial class BankEntities1 : DbContext
+    public partial class BankEntities2 : DbContext
     {
-        public BankEntities1()
-            : base("name=BankEntities1")
+        public BankEntities2()
+            : base("name=BankEntities2")
         {
         }
     
@@ -28,14 +28,14 @@ namespace BusinessLayer
         }
     
         public virtual DbSet<Account> Accounts { get; set; }
-        public virtual DbSet<Customer> Customers { get; set; }
-        public virtual DbSet<Login> Logins { get; set; }
-        public virtual DbSet<Transaction> Transactions { get; set; }
         public virtual DbSet<Branch> Branches { get; set; }
+        public virtual DbSet<Customer> Customers { get; set; }
         public virtual DbSet<CustomerMedal> CustomerMedals { get; set; }
+        public virtual DbSet<Login> Logins { get; set; }
         public virtual DbSet<Manager> Managers { get; set; }
+        public virtual DbSet<Transaction> Transactions { get; set; }
     
-        public virtual int addCustomer(string custName, string gender, string dob, string address, string state, string city, string pincode, string phoneNo, string email, string createdDate, string editedDate, string userId)
+        public virtual int addCustomer(string custName, string gender, string dob, string address, string state, string city, string pincode, string phoneNo, string email, string createdDate, string editedDate, string userId, string branchId, Nullable<int> managerId)
         {
             var custNameParameter = custName != null ?
                 new ObjectParameter("custName", custName) :
@@ -85,10 +85,18 @@ namespace BusinessLayer
                 new ObjectParameter("userId", userId) :
                 new ObjectParameter("userId", typeof(string));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("addCustomer", custNameParameter, genderParameter, dobParameter, addressParameter, stateParameter, cityParameter, pincodeParameter, phoneNoParameter, emailParameter, createdDateParameter, editedDateParameter, userIdParameter);
+            var branchIdParameter = branchId != null ?
+                new ObjectParameter("branchId", branchId) :
+                new ObjectParameter("branchId", typeof(string));
+    
+            var managerIdParameter = managerId.HasValue ?
+                new ObjectParameter("managerId", managerId) :
+                new ObjectParameter("managerId", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("addCustomer", custNameParameter, genderParameter, dobParameter, addressParameter, stateParameter, cityParameter, pincodeParameter, phoneNoParameter, emailParameter, createdDateParameter, editedDateParameter, userIdParameter, branchIdParameter, managerIdParameter);
         }
     
-        public virtual int addDetails(Nullable<int> customerId, string accounttype, string dateOfOpen, string status, string dateOfEdited, string closingDate, Nullable<int> amount)
+        public virtual int addDetails(Nullable<int> customerId, string accounttype, string dateOfOpen, string status, string dateOfEdited, string closingDate, Nullable<int> amount, string type)
         {
             var customerIdParameter = customerId.HasValue ?
                 new ObjectParameter("customerId", customerId) :
@@ -118,7 +126,11 @@ namespace BusinessLayer
                 new ObjectParameter("amount", amount) :
                 new ObjectParameter("amount", typeof(int));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("addDetails", customerIdParameter, accounttypeParameter, dateOfOpenParameter, statusParameter, dateOfEditedParameter, closingDateParameter, amountParameter);
+            var typeParameter = type != null ?
+                new ObjectParameter("type", type) :
+                new ObjectParameter("type", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("addDetails", customerIdParameter, accounttypeParameter, dateOfOpenParameter, statusParameter, dateOfEditedParameter, closingDateParameter, amountParameter, typeParameter);
         }
     
         public virtual int addLogin(string userId, string password, string role)
@@ -138,6 +150,31 @@ namespace BusinessLayer
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("addLogin", userIdParameter, passwordParameter, roleParameter);
         }
     
+        public virtual int addManager(string managerName, string branchId, string address, string phoneNo, string email)
+        {
+            var managerNameParameter = managerName != null ?
+                new ObjectParameter("managerName", managerName) :
+                new ObjectParameter("managerName", typeof(string));
+    
+            var branchIdParameter = branchId != null ?
+                new ObjectParameter("branchId", branchId) :
+                new ObjectParameter("branchId", typeof(string));
+    
+            var addressParameter = address != null ?
+                new ObjectParameter("address", address) :
+                new ObjectParameter("address", typeof(string));
+    
+            var phoneNoParameter = phoneNo != null ?
+                new ObjectParameter("phoneNo", phoneNo) :
+                new ObjectParameter("phoneNo", typeof(string));
+    
+            var emailParameter = email != null ?
+                new ObjectParameter("email", email) :
+                new ObjectParameter("email", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("addManager", managerNameParameter, branchIdParameter, addressParameter, phoneNoParameter, emailParameter);
+        }
+    
         public virtual ObjectResult<Nullable<int>> balanceEnq(Nullable<long> acc)
         {
             var accParameter = acc.HasValue ?
@@ -145,6 +182,19 @@ namespace BusinessLayer
                 new ObjectParameter("acc", typeof(long));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<Nullable<int>>("balanceEnq", accParameter);
+        }
+    
+        public virtual int changeMedal(Nullable<int> amt, Nullable<long> acc)
+        {
+            var amtParameter = amt.HasValue ?
+                new ObjectParameter("amt", amt) :
+                new ObjectParameter("amt", typeof(int));
+    
+            var accParameter = acc.HasValue ?
+                new ObjectParameter("acc", acc) :
+                new ObjectParameter("acc", typeof(long));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("changeMedal", amtParameter, accParameter);
         }
     
         public virtual ObjectResult<string> changePass(string uid)
@@ -192,6 +242,15 @@ namespace BusinessLayer
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("checkCust", customerIDParameter);
         }
     
+        public virtual ObjectResult<string> checkMedal(Nullable<int> amt)
+        {
+            var amtParameter = amt.HasValue ?
+                new ObjectParameter("amt", amt) :
+                new ObjectParameter("amt", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("checkMedal", amtParameter);
+        }
+    
         public virtual ObjectResult<datecheck_Result> datecheck(Nullable<long> acc, string start, string end)
         {
             var accParameter = acc.HasValue ?
@@ -227,6 +286,15 @@ namespace BusinessLayer
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("deleteDetails", accountNoParameter);
         }
     
+        public virtual int deleteManager(string managerId)
+        {
+            var managerIdParameter = managerId != null ?
+                new ObjectParameter("managerId", managerId) :
+                new ObjectParameter("managerId", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("deleteManager", managerIdParameter);
+        }
+    
         public virtual int deposit(Nullable<long> acc, Nullable<int> amt)
         {
             var accParameter = acc.HasValue ?
@@ -240,23 +308,19 @@ namespace BusinessLayer
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("deposit", accParameter, amtParameter);
         }
     
-        public virtual int editedDetails(Nullable<int> accountNo, Nullable<int> customerId, string accounttype, string dateOfOpen, string status, string dateOfEdited, string closingDate, Nullable<int> amount)
+        public virtual int editedDetails(Nullable<long> accountNo, string accounttype, string type, string status, string dateOfEdited, string closingDate, Nullable<int> amount)
         {
             var accountNoParameter = accountNo.HasValue ?
                 new ObjectParameter("accountNo", accountNo) :
-                new ObjectParameter("accountNo", typeof(int));
-    
-            var customerIdParameter = customerId.HasValue ?
-                new ObjectParameter("customerId", customerId) :
-                new ObjectParameter("customerId", typeof(int));
+                new ObjectParameter("accountNo", typeof(long));
     
             var accounttypeParameter = accounttype != null ?
                 new ObjectParameter("accounttype", accounttype) :
                 new ObjectParameter("accounttype", typeof(string));
     
-            var dateOfOpenParameter = dateOfOpen != null ?
-                new ObjectParameter("DateOfOpen", dateOfOpen) :
-                new ObjectParameter("DateOfOpen", typeof(string));
+            var typeParameter = type != null ?
+                new ObjectParameter("type", type) :
+                new ObjectParameter("type", typeof(string));
     
             var statusParameter = status != null ?
                 new ObjectParameter("status", status) :
@@ -274,12 +338,50 @@ namespace BusinessLayer
                 new ObjectParameter("amount", amount) :
                 new ObjectParameter("amount", typeof(int));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("editedDetails", accountNoParameter, customerIdParameter, accounttypeParameter, dateOfOpenParameter, statusParameter, dateOfEditedParameter, closingDateParameter, amountParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("editedDetails", accountNoParameter, accounttypeParameter, typeParameter, statusParameter, dateOfEditedParameter, closingDateParameter, amountParameter);
+        }
+    
+        public virtual int editManager(Nullable<int> managerId, string managerName, string address, string phoneNo, string emailId, string branchId)
+        {
+            var managerIdParameter = managerId.HasValue ?
+                new ObjectParameter("managerId", managerId) :
+                new ObjectParameter("managerId", typeof(int));
+    
+            var managerNameParameter = managerName != null ?
+                new ObjectParameter("managerName", managerName) :
+                new ObjectParameter("managerName", typeof(string));
+    
+            var addressParameter = address != null ?
+                new ObjectParameter("address", address) :
+                new ObjectParameter("address", typeof(string));
+    
+            var phoneNoParameter = phoneNo != null ?
+                new ObjectParameter("phoneNo", phoneNo) :
+                new ObjectParameter("phoneNo", typeof(string));
+    
+            var emailIdParameter = emailId != null ?
+                new ObjectParameter("emailId", emailId) :
+                new ObjectParameter("emailId", typeof(string));
+    
+            var branchIdParameter = branchId != null ?
+                new ObjectParameter("branchId", branchId) :
+                new ObjectParameter("branchId", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("editManager", managerIdParameter, managerNameParameter, addressParameter, phoneNoParameter, emailIdParameter, branchIdParameter);
         }
     
         public virtual ObjectResult<getAllCustomers_Result> getAllCustomers()
         {
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<getAllCustomers_Result>("getAllCustomers");
+        }
+    
+        public virtual ObjectResult<string> getBranch(string userId)
+        {
+            var userIdParameter = userId != null ?
+                new ObjectParameter("userId", userId) :
+                new ObjectParameter("userId", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("getBranch", userIdParameter);
         }
     
         public virtual ObjectResult<string> getCustomerName(string uid)
@@ -289,6 +391,15 @@ namespace BusinessLayer
                 new ObjectParameter("uid", typeof(string));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("getCustomerName", uidParameter);
+        }
+    
+        public virtual ObjectResult<string> getMedal(Nullable<long> acc)
+        {
+            var accParameter = acc.HasValue ?
+                new ObjectParameter("acc", acc) :
+                new ObjectParameter("acc", typeof(long));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("getMedal", accParameter);
         }
     
         public virtual ObjectResult<getSpecificCustomer_Result> getSpecificCustomer(Nullable<int> custId)
@@ -373,7 +484,7 @@ namespace BusinessLayer
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("transferSub", amtParameter, accParameter);
         }
     
-        public virtual int updateCustomer(Nullable<int> custId, string custName, string gender, string dob, string address, string state, string city, string pincode, string phoneNo, string email, string editedDate, string userId)
+        public virtual int updateCustomer(Nullable<int> custId, string custName, string gender, string dob, string address, string state, string city, string pincode, string phoneNo, string editedDate)
         {
             var custIdParameter = custId.HasValue ?
                 new ObjectParameter("custId", custId) :
@@ -411,19 +522,11 @@ namespace BusinessLayer
                 new ObjectParameter("phoneNo", phoneNo) :
                 new ObjectParameter("phoneNo", typeof(string));
     
-            var emailParameter = email != null ?
-                new ObjectParameter("email", email) :
-                new ObjectParameter("email", typeof(string));
-    
             var editedDateParameter = editedDate != null ?
                 new ObjectParameter("editedDate", editedDate) :
                 new ObjectParameter("editedDate", typeof(string));
     
-            var userIdParameter = userId != null ?
-                new ObjectParameter("userId", userId) :
-                new ObjectParameter("userId", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("updateCustomer", custIdParameter, custNameParameter, genderParameter, dobParameter, addressParameter, stateParameter, cityParameter, pincodeParameter, phoneNoParameter, emailParameter, editedDateParameter, userIdParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("updateCustomer", custIdParameter, custNameParameter, genderParameter, dobParameter, addressParameter, stateParameter, cityParameter, pincodeParameter, phoneNoParameter, editedDateParameter);
         }
     
         public virtual int updatePass(string uid, string pass)

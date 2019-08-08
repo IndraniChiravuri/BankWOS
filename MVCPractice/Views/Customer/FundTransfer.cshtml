@@ -4,34 +4,36 @@
     ViewBag.Title = "FundTransfer";
 
 }
-    <h2>FundTransfer</h2>
+<script src="~/Scripts/jquery-3.4.1.min.js" type="text/javascript"></script>
+<script src="~/Scripts/jquery.validate.min.js" type="text/javascript"></script>
+
     <div>
         @ViewBag.Error
     </div>
     <div>
         @ViewBag.Success
     </div>
-@using (Html.BeginForm())
+@using (Html.BeginForm(new { id = "FundTransferForm" }))
 {
-    <div class="jumbotron d-inline-block" style=" margin-top: 100px">
+    <div class="jumbotron bg-light text-dark" style=" margin-top: 100px">
         <div>
             <h1><label id="Label1">Fund Transfer</label></h1>
         </div>
-        <div class="input-group mb-3">
-            <label id="Label2" class="input-group-text input-group-prepend">Source Account No</label>
-            @Html.EditorFor(Model => Model.accountNo)
+        <div class="form-group">
+            <label id="Label2" class="col-form-label">Source Account No</label>
+            <label id="Label2" class="form-control">@Session["accountNumber"]</label>
         </div>
-        <div class="input-group mb-3">
-            <label id="Label2" class="input-group-text input-group-prepend">Destination Account No</label>
-            @Html.Editor("destinationAccountNo")
+        <div class="form-group">
+            <label id="Label2" class="col-form-label">Destination Account No</label>
+            <input type="text" name="destinationAccountNo" id="destinationAccountNo" class="form-control" />
         </div>
-        <div class="input-group mb-3">
-            <label id="Label4" class="input-group-text input-group-prepend">Amount</label>
-            @Html.EditorFor(Model => Model.amount)
+        <div class="form-group">
+            <label id="Label4" class="col-form-label">Amount</label>
+            <input type="text" name="amount" id="amount" class="form-control" />
         </div>
-        <div class="input-group mb-3">
-            <label id="Label5" class="input-group-text input-group-prepend">Comment</label>
-            @Html.Editor("comment")
+        <div class="form-group">
+            <label id="Label5" class="col-form-label">Comment</label>
+            <input type="text" name="comment" id="comment" class="form-control" />
         </div>
         <div>
             <input type="submit" class="btn btn-outline-success" value="Transfer" />
@@ -40,4 +42,38 @@
 
     </div>
 }
+<script type="text/javascript">
+   
+    $().ready(function () {
+        $("#FundTransferForm").validate({
+            rules: {
+                destinationAccountNo: {
+                    required: true,
+                    maxlength: 10,
+                    minlength: 3
+                },
+                amount: {
+                    required: true,
+                    maxlength: 10,
+                    minlength: 3
+                },
+                comment: {
+                    required: true,
+                    maxlength: 10,
+                    minlength: 3
+                }
+
+            },
+                messages: {
+            amount: {
+                            required: "First name is required",
+                            maxlength: "Too long",
+                            minlength: "Too short"
+            },
+      
+                }
+    });
+    });
+    // ]]>
+</script>
 

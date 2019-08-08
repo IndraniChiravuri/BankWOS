@@ -6,30 +6,29 @@
 
 <script type="text/javascript">
     $(function () {
-        // This will make every element with the class "date-picker" into a DatePicker element
         $('.date-picker').datepicker();
     })
 </script>
-
-<h2>CustomStatement</h2>
-<div class="jumbotron d-inline-block" style=" margin-top: 100px">
-@using (Html.BeginForm())
-{
-    <div class="input-group mb-3">
-        <Label ID="Label1"   Class="input-group-text input-group-prepend">Account no:</Label>
-        <label id="Account" class="form-control">@Session["accountNumber"]</label>
-    </div>
-    <div class="input-group mb-3">
-        <Label ID="Label2"  Class="input-group-text input-group-prepend">From Date:</Label>
-        @Html.TextBox("fromDate", "", new { @class = "date-picker" })
-        
-    </div>
-    <div class="input-group mb-3">
-        <Label ID="Label3"  Class="input-group-text input-group-prepend">To Date:</Label>
-        @Html.TextBox("toDate", "", new { @class = "date-picker" })
-    </div>
+<div class="jumbotron bg-light text-dark">
     <div>
-        <input type="submit" class="btn btn-outline-success" value="Submit" />
+        <h1><label id="Label1">Custom Statement</label></h1>
     </div>
-}
+    @using (Html.BeginForm())
+    {
+        <div class="form-group">
+            <label id="Label1" class="col-form-label">Account no:</label>
+            <label id="Account" class="form-control">@Session["accountNumber"]</label>
+        </div>
+        <div class="form-group">
+            <label id="Label2" class="col-form-label">From Date:</label>
+            <input type="text" name="fromDate" id="fromDate" class="form-control date-picker" />
+        </div>
+        <div class="form-group">
+            <label id="Label3" class="col-form-label">To Date:</label>
+            <input type="text" name="toDate" id="toDate" class="form-control date-picker" />
+        </div>
+        <div>
+            <input type="submit" class="btn btn-outline-success" value="Submit" />
+        </div>
+    }
 </div>

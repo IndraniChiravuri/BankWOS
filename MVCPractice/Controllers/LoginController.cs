@@ -14,6 +14,7 @@ namespace MVCPractice.Controllers
 
         public ActionResult Index()
         {
+
             string role=Convert.ToString(Session["role"]);
             //string mgr = "Manager";
             if (Session["accountNumber"] != null)
@@ -21,23 +22,32 @@ namespace MVCPractice.Controllers
                 Session["accountNumber"] = null;
             }
             if (role.Equals("Manager"))
+            {
+               
                 return RedirectToAction("Index", "Manager");
+            }
             else if (role.Equals("Customer"))
                 return RedirectToAction("Index", "Customer");
+            else if (role.Equals("BankManager"))
+                return RedirectToAction("Index", "SuperManager");
             else
-            return View();
+            {
+            
+                return View();
+            }
         }
 
         [HttpPost]
         public ActionResult LoginCheck(string userId,string password)
         {
             LoginClass obj = new LoginClass();
+            ManagerClass mobj=new ManagerClass();
             string result=obj.checkCredentials(userId, password);
             if (result == "Manager")
             {
                 Session["role"] = "Manager";
                 Session["userId"] = userId;
-
+                Session["branch"] = mobj.getBranchIdOfManager(userId);
                 return RedirectToAction("Index", "Manager");
             }
             else if (result == "Customer")
@@ -46,6 +56,17 @@ namespace MVCPractice.Controllers
                 Session["userId"] = userId;
                 return RedirectToAction("Index", "Customer");
 
+            }
+            else if (result == "BankManager")
+            {
+                Session["role"] = "BankManager";
+                Session["userId"] = userId;
+                return RedirectToAction("Index", "SuperManager");
+
+            }
+            else
+            {
+                Session["WrongCredentials"]=result;
             }
             return RedirectToAction("Index");
         }

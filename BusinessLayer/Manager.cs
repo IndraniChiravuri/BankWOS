@@ -24,8 +24,10 @@ namespace BusinessLayer
         public int managerId { get; set; }
         public string address { get; set; }
         public string phoneNo { get; set; }
+        public string userId { get; set; }
     
         public virtual Branch Branch { get; set; }
         public virtual ICollection<Customer> Customers { get; set; }
+        public virtual Login Login { get; set; }
     }
 }

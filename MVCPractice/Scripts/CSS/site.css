@@ -1,0 +1,44 @@
+﻿body {
+}
+.leftside, .rightside {
+    height: 100vh;
+}
+
+@media screen and (min-width:0px){
+    .leftside, .rightside {
+        height: 100vh;
+    }
+}
+
+.leftside{
+    width: 100%;
+    /*background-color : black;*/
+}
+
+.rightside {
+    width: 100%;
+    background-color:#c2bcbc;
+}
+
+.card {
+    width:auto;
+    /*text-align: center;*/
+    align-content: center;
+}
+
+/*input[type="text"],
+select*/.form-control {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #000000;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+/*input[type="text"]:focus,
+select*/.form-control:focus {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+

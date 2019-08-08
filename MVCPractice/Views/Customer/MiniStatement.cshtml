@@ -6,8 +6,10 @@
     ViewBag.Title = "MiniStatement";
 }
 
-<h2>MiniStatement</h2>
-<div class="jumbotron d-inline-block" style=" margin-top: 100px">
+<div class="jumbotron bg-light text-dark">
+    <div>
+        <h1><label id="Label1">Mini Statement</label></h1>
+    </div>
     <label id="message"></label>
     <div class="table-responsive">
         <div>
@@ -30,13 +32,13 @@
                             @transaction.transactionId
                         </td>
                         <td>
-                            @if (transaction.transactionType == "FundTransfer"||transaction.transactionType == "withdraw")
+                            @if (transaction.transactionType == "FundTransfer" || transaction.transactionType == "withdraw")
                             {
                                 @transaction.fromAccountNo
                             }
                             else
                             {
-                            <em>  - </em>
+                                <em>  - </em>
                             }
 
                         </td>
